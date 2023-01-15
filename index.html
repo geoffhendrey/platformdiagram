@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <style>
+    /* styles for the boxes and arrows */
+    .box {
+      fill: #fff;
+      stroke: #000;
+      stroke-width: 2px;
+    }
+
+    .arrow {
+      fill: none;
+      stroke: #000;
+      stroke-width: 2px;
+      marker-end: url(#arrowhead);
+    }
+
+    /* styles for the labels */
+    .label {
+      font-size: 14px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <svg width="800" height="600">
+    <defs>
+      <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" markerUnits="strokeWidth">
+        <path d="M0,0 L0,6 L9,3 z" fill="#000"/>
+      </marker>
+    </defs>
+  </svg>
+  <script>
+    // data for the boxes and arrows
+    var data = {
+      boxes: [
+        {x: 100, y: 100, width: 100, height: 50, label: "Step 1", url: "https://try.jsonata.org/G1WiH7y8N"},
+        {x: 300, y: 200, width: 100, height: 50, label: "Step 2", url: "https://try.jsonata.org/FlZJV-YG0"}
+      ],
+      arrows: [
+        {from: 0, to: 1}
+      ]
+    };
+
+    // select the svg element
+    var svg = d3.select("svg");
+
+    // create the boxes
+    var boxes = svg.selectAll(".box")
+      .data(data.boxes)
+      .enter()
+      .append("rect")
+        .attr("x", function(d) { return d.x; })
+        .attr("y", function(d) { return d.y; })
+        .attr("width", function(d) { return d.width; })
+        .attr("height", function(d) { return d.height; })
+        .attr("class", "box")
+        .on("click", function(d) {
+          window.open(d.url);
+        })
+	.on("mouseover", function(d) {
+        d3.select("#hover-window")
+          .style("display", "block")
+          .style("left", (d3.event.pageX + 10) + "px")
+          .style("top", (d3.event.pageY + 10) + "px")
+          .html("click to try jsonata " + d.url);
+      })
+      .on("mouseout", function() {
+        d3.select("#hover-window")
+          .style("display", "none");
+      });
+  // create the arrows
+  var arrows = svg.selectAll(".arrow")
+    .data(data.arrows)
+    .enter()
+    .append("line")
+    .attr("class","arrow")
+    .attr("x1", function(d) { return data.boxes[d.from].x + data.boxes[d.from].width/2; })
+    .attr("y1", function(d) { return data.boxes[d.from].y + data.boxes[d.from].height/2; })
+    .attr("x2", function(d) { return data.boxes[d.to].x + data.boxes[d.to].width/2; })
+    .attr("y2", function(d) { return data.boxes[d.to].y + data.boxes[d.to].height/2; })
+    .attr("marker-end", "url(#arrowhead)");
+
+ // create the labels
+  var labels = svg.selectAll(".label")
+    .data(data.boxes)
+    .enter()
+    .append("text")
+      .attr("x", function(d) { return d.x + d.width/2; })
+      .attr("y", function(d) { return d.y + d.height/2; })
+      .attr("class", "label")
+      .attr("text-anchor", "middle")
+      .attr("alignment-baseline", "central")
+      .text(function(d) { return d.label; });   
+
+  // create the hover window
+  var hoverWindow = d3.select("body")
+    .append("div")
+    .attr("id", "hover-window")
+    .style("display", "none")
+    .style("position", "absolute")
+    .style("background", "#fff")
+    .style("padding", "10px")
+    .style("border", "1px solid #000");
+
+  </script>
+</body>
+</html>
+
